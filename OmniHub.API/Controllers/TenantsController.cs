@@ -19,6 +19,6 @@ public class TenantsController : ControllerBase
     public async Task<IActionResult> CreateTenant([FromBody] CreateTenantCommand command)
     {
         var tenantId = await _mediator.Send(command);
-        return Ok(new { Message = "Müşteri başarıyla oluşturuldu!", TenantId = tenantId });
+        return Ok(new { Message = "Customer created successfully!", TenantId = tenantId });
     }
 }

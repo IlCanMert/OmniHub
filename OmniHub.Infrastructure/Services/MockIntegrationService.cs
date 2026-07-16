@@ -14,23 +14,23 @@ public class MockIntegrationService : IIntegrationService
 
     public async Task<bool> UpdateStockAsync(string platformName, string sku, int newStock)
     {
-        // Gerçekte burada HttpClient ile Trendyol veya Shopify API'sine istek atılacak.
-        // Şimdilik işlemi simüle etmek için 1 saniye bekletiyoruz.
+        // In production, this would call Trendyol or Shopify APIs via HttpClient.
+        // For now, we simulate the operation with a 1-second delay.
         await Task.Delay(1000); 
         
-        _logger.LogInformation($"[Mock API] {platformName} platformunda '{sku}' kodlu ürünün stoku {newStock} olarak güncellendi.");
+        _logger.LogInformation($"[Mock API] Stock for SKU '{sku}' on {platformName} was updated to {newStock}.");
         
         return true;
     }
 
-    // HATA BURADAYDI: Task<Task<...>> yerine Task<IEnumerable<string>> yaptık
+    // BUG WAS HERE: changed Task<Task<...>> to Task<IEnumerable<string>>
     public async Task<IEnumerable<string>> FetchNewOrdersAsync(string platformName)
     {
         await Task.Delay(1000);
         
-        _logger.LogInformation($"[Mock API] {platformName} platformundan yeni siparişler kontrol ediliyor...");
+        _logger.LogInformation($"[Mock API] Checking new orders from {platformName}...");
         
-        // async metodun içinde olduğumuz için doğrudan List döndürebiliriz (Task.FromResult'a gerek yok)
+        // Since we are already in an async method, we can return List directly (no Task.FromResult needed)
         return new List<string> { $"ORD-{Random.Shared.Next(1000, 9999)}" };
     }
 }

@@ -18,19 +18,19 @@ public class SubscriptionController : ControllerBase
     {
         if (string.IsNullOrEmpty(payload.CustomerEmail) || payload.AmountPaid <= 0)
         {
-            return BadRequest("Geçersiz webhook verisi.");
+            return BadRequest("Invalid webhook payload.");
         }
 
-        _logger.LogInformation($"Ödeme Alındı! Müşteri: {payload.CustomerEmail}, Tutar: {payload.AmountPaid} {payload.Currency}");
+        _logger.LogInformation($"Payment received! Customer: {payload.CustomerEmail}, Amount: {payload.AmountPaid} {payload.Currency}");
 
         var generatedTenantId = Guid.NewGuid().ToString();
 
-        _logger.LogInformation($"Yeni Kiracı (Tenant) otomatik olarak oluşturuldu! ID: {generatedTenantId}");
+        _logger.LogInformation($"New tenant created automatically! ID: {generatedTenantId}");
 
         return Ok(new
         {
             Status = "Success",
-            Message = "Ödeme onaylandı, şirket profili ve izole çalışma alanı başarıyla oluşturuldu.",
+            Message = "Payment approved, company profile and isolated workspace created successfully.",
             Details = new
             {
                 Email = payload.CustomerEmail,
@@ -46,6 +46,6 @@ public class PaymentSuccessWebhookPayload
     public string CustomerEmail { get; set; } = string.Empty;
     public decimal AmountPaid { get; set; }
     public string Currency { get; set; } = "TRY";
-    public string PlanName { get; set; } = "Standart Aylık Paket";
+    public string PlanName { get; set; } = "Standard Monthly Plan";
     public string TransactionId { get; set; } = string.Empty;
 }

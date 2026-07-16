@@ -7,7 +7,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Bu projenin içindeki tüm Command ve Query'leri bulup sisteme kaydeder
+        // Finds all commands and queries in this project and registers them
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         
         return services;

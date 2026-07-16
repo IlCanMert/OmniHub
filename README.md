@@ -1,28 +1,28 @@
 # OmniHub - Multi-Tenant B2B SaaS Platform
 
-OmniHub, modern yazılım mimarisi prensipleriyle sıfırdan geliştirilmiş, çoklu kiracı (multi-tenant) destekli bir B2B e-ticaret stok yönetimi altyapısıdır.
+OmniHub is a B2B e-commerce inventory management infrastructure built from scratch with modern software architecture principles and multi-tenant support.
 
-## 🚀 Proje Vizyonu
-Bu proje, bağımsız bir geliştirici olarak "temiz mimari" (Clean Architecture) ve "veri izolasyonu" kavramlarının gerçek dünyada nasıl uygulanacağını göstermek amacıyla inşa edilmiştir. Sistem, tek bir veritabanı üzerinde JWT tabanlı kimlik doğrulama ile farklı şirketlerin (tenant) verilerini birbirinden %100 izole eder.
+## 🚀 Project Vision
+This project was built to demonstrate how "clean architecture" and "data isolation" concepts can be applied in the real world by an independent developer. The system uses JWT-based authentication on a single database while keeping data from different companies (tenants) 100% isolated.
 
-## 🏗️ Kullanılan Teknolojiler & Mimari
+## 🏗️ Technologies & Architecture
 * **Backend:** .NET 10 (C#), ASP.NET Core Web API
 * **Frontend:** Blazor WebAssembly
-* **Veritabanı:** PostgreSQL (Entity Framework Core)
-* **Mimari:** Onion Architecture (Domain, Application, Infrastructure, Presentation)
-* **Altyapı & Orkestrasyon:** Docker & Docker Compose
-* **Ağ Yönetimi:** Nginx (Reverse Proxy)
+* **Database:** PostgreSQL (Entity Framework Core)
+* **Architecture:** Onion Architecture (Domain, Application, Infrastructure, Presentation)
+* **Infrastructure & Orchestration:** Docker & Docker Compose
+* **Network Management:** Nginx (Reverse Proxy)
 
-## 🔥 Öne Çıkan Özellikler
-* **Gerçek Multi-Tenancy:** Her kullanıcının kendi `TenantId`'si ile sisteme kayıt olması ve JWT içindeki claim'ler ile veri izolasyonunun sağlanması.
-* **Konteynerize Altyapı:** API, Blazor Client ve Veritabanının kendi özel Docker ağlarında (custom network) haberleştiği, `healthcheck` kontrollü hatasız başlangıç dizilimi.
-* **Webhook Simülasyonu:** Dış ödeme sistemlerinden (Stripe/İyzico vb.) gelebilecek başarılı ödeme sinyallerini yakalayıp otomatik Tenant (Şirket) oluşturan abonelik uç noktası.
+## 🔥 Key Features
+* **True Multi-Tenancy:** Each user is registered with their own `TenantId`, and data isolation is enforced through claims in JWT.
+* **Containerized Infrastructure:** API, Blazor Client, and Database communicate over dedicated Docker networks with a healthcheck-driven startup sequence.
+* **Webhook Simulation:** A subscription endpoint that captures successful payment signals from external payment systems (Stripe/Iyzico, etc.) and automatically creates a Tenant (Company).
 
-## ⚙️ Nasıl Çalıştırılır?
-Projeyi kendi bilgisayarınızda ayağa kaldırmak için sisteminizde Docker'ın yüklü olması yeterlidir.
+## ⚙️ How to Run
+To run the project on your machine, having Docker installed is enough.
 
-1. Repoyu bilgisayarınıza indirin.
-2. Terminali açıp projenin ana dizinine gidin.
-3. Aşağıdaki komutu çalıştırın:
+1. Clone or download the repository to your computer.
+2. Open a terminal and go to the project root directory.
+3. Run the command below:
    ```bash
    docker-compose up -d --build

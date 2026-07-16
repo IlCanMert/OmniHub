@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using OmniHub.Application.Interfaces; // Bu satırı ekledik
+using OmniHub.Application.Interfaces; // Added this line
 using OmniHub.Domain.Entities;
 
 namespace OmniHub.Infrastructure.Context;
 
-// IApplicationDbContext arayüzünü (interface) ekledik
+// Added IApplicationDbContext interface
 public class OmniHubDbContext : DbContext, IApplicationDbContext 
 {
     public OmniHubDbContext(DbContextOptions<OmniHubDbContext> options) : base(options)

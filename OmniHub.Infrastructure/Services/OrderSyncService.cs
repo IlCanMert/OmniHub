@@ -7,7 +7,7 @@ namespace OmniHub.Infrastructure.Services;
 public class OrderSyncService
 {
     private readonly IIntegrationService _integrationService;
-    private readonly ISender _mediator; // MediatR'ı sipariş komutunu tetiklemek için kullanıyoruz
+    private readonly ISender _mediator; // Used to trigger the order command via MediatR
 
     public OrderSyncService(IIntegrationService integrationService, ISender mediator)
     {
@@ -15,22 +15,22 @@ public class OrderSyncService
         _mediator = mediator;
     }
 
-    // Hangfire'ın her dakika tetikleyeceği metot
+    // Method triggered every minute by Hangfire
     public async Task PollAndProcessOrdersAsync()
     {
-        // 1. Trendyol'dan yeni gelen siparişleri çek (Mock API)
+        // 1. Pull new incoming orders from Trendyol (Mock API)
         var orders = await _integrationService.FetchNewOrdersAsync("Trendyol");
 
-        // 2. Eğer sipariş varsa (Mock servisimiz her dakika rastgele 1 sipariş kodu üretir)
+        // 2. If there are orders (our mock service generates 1 random order code every minute)
         foreach (var orderId in orders)
         {
-            // Test senaryomuz gereği: Satılan ürünün "KAZAK-KIRMIZI-L" olduğunu simüle ediyoruz.
-            // Gerçek projede e-ticaret API'sinden hangi SKU'nun satıldığı bilgisi gelir.
+            // For this test scenario: we simulate that the sold product is "KAZAK-KIRMIZI-L".
+            // In a real project, the sold SKU would come from the e-commerce API.
             await _mediator.Send(new ProcessOrderCommand
             {
                 PlatformName = "Trendyol",
                 SKU = "KAZAK-KIRMIZI-L",
-                Quantity = 5 // Her siparişte 5 adet satıldığını varsayalım
+                Quantity = 5 // Assume 5 units are sold per order
             });
         }
     }

@@ -18,7 +18,7 @@ public class AuthController : ControllerBase
     {
         _configuration = configuration;
         
-        // Testler için varsayılan kurucu hesabı
+        // Default founder account for tests
         if (!_users.ContainsKey("admin@omnihub.com"))
         {
             _users.Add("admin@omnihub.com", ("123456", "dff711f9-03a1-4084-9f18-cfbf3ebb7f09"));
@@ -29,16 +29,16 @@ public class AuthController : ControllerBase
     public IActionResult Register([FromBody] RegisterRequest request)
     {
         if (_users.ContainsKey(request.Email))
-            return BadRequest("Bu e-posta adresi ile zaten bir abonelik mevcut.");
+            return BadRequest("A subscription already exists with this email address.");
 
-        // Veritabanı izolasyonu, şirket ID'si
+        // Database isolation, company ID
         var newTenantId = Guid.NewGuid().ToString();
         
         _users.Add(request.Email, (request.Password, newTenantId));
 
         return Ok(new 
         { 
-            Message = "Ödeme onaylandı ve hesabınız oluşturuldu!", 
+            Message = "Payment approved and your account has been created!", 
             TenantId = newTenantId 
         });
     }
@@ -49,10 +49,10 @@ public class AuthController : ControllerBase
         if (_users.TryGetValue(request.Email, out var user) && user.Password == request.Password)
         {
             var token = GenerateJwtToken(request.Email, user.TenantId);
-            return Ok(new { Token = token, Message = "Giriş başarılı!" });
+            return Ok(new { Token = token, Message = "Login successful!" });
         }
 
-        return Unauthorized("Hatalı e-posta veya şifre.");
+        return Unauthorized("Incorrect email or password.");
     }
 
     private string GenerateJwtToken(string email, string tenantId)
@@ -93,5 +93,5 @@ public class RegisterRequest
 {
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
-    //PaymentTransactionId eklenecek
+    // PaymentTransactionId will be added
 }

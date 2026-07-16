@@ -7,14 +7,14 @@
 <PageTitle>OmniHub Dashboard</PageTitle>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="fw-bold text-dark">OmniHub Stok Yönetimi</h1>
-    <button class="btn btn-outline-danger" @onclick="Logout">Güvenli Çıkış</button>
+    <h1 class="fw-bold text-dark">OmniHub Inventory Management</h1>
+    <button class="btn btn-outline-danger" @onclick="Logout">Secure Logout</button>
 </div>
 
 <div class="row">
     <div class="col-md-4 mb-4">
         <div class="card border-0 shadow-sm p-4">
-            <h4 class="fw-bold mb-3 text-dark">Yeni Ürün Ekle</h4>
+            <h4 class="fw-bold mb-3 text-dark">Add New Product</h4>
             
             @if (!string.IsNullOrEmpty(formMessage))
             {
@@ -22,38 +22,38 @@
             }
 
             <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">SKU (Stok Kodu)</label>
-                <input type="text" class="form-control" @bind="newProduct.SKU" placeholder="Örn: KZN-WR-001" />
+                <label class="form-label text-muted small fw-bold">SKU (Stock Code)</label>
+                <input type="text" class="form-control" @bind="newProduct.SKU" placeholder="e.g.: KZN-WR-001" />
             </div>
             <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">Ürün Adı</label>
-                <input type="text" class="form-control" @bind="newProduct.Name" placeholder="Örn: Kırmızı Kazak" />
+                <label class="form-label text-muted small fw-bold">Product Name</label>
+                <input type="text" class="form-control" @bind="newProduct.Name" placeholder="e.g.: Red Sweater" />
             </div>
             <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">Stok Adedi</label>
+                <label class="form-label text-muted small fw-bold">Stock Quantity</label>
                 <input type="number" class="form-control" @bind="newProduct.TotalStock" />
             </div>
             <div class="mb-4">
-                <label class="form-label text-muted small fw-bold">Fiyat (₺)</label>
+                <label class="form-label text-muted small fw-bold">Price (₺)</label>
                 <input type="number" class="form-control" @bind="newProduct.Price" />
             </div>
             <button class="btn btn-dark w-100 py-2 fw-bold" @onclick="AddProduct">
-                Ürünü Kaydet
+                Save Product
             </button>
         </div>
     </div>
 
     <div class="col-md-8">
         <div class="card border-0 shadow-sm p-4">
-            <h4 class="fw-bold mb-3 text-dark">Stok Durumu</h4>
+            <h4 class="fw-bold mb-3 text-dark">Inventory Status</h4>
             @if (products == null)
             {
-                <p><em>Veriler yükleniyor...</em></p>
+                <p><em>Loading data...</em></p>
             }
             else if (products.Count == 0)
             {
                 <div class="text-center py-5">
-                    <p class="text-muted mb-0">Henüz hiç ürün eklenmemiş. Soldaki formu kullanarak ilk ürününüzü ekleyin!</p>
+                    <p class="text-muted mb-0">No products have been added yet. Use the form on the left to add your first product!</p>
                 </div>
             }
             else
@@ -62,9 +62,9 @@
                     <thead class="table-light">
                         <tr>
                             <th>SKU</th>
-                            <th>Ürün Adı</th>
-                            <th>Stok</th>
-                            <th>Fiyat</th>
+                            <th>Product Name</th>
+                            <th>Stock</th>
+                            <th>Price</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,7 +73,7 @@
                             <tr>
                                 <td class="fw-bold text-secondary">@product.SKU</td>
                                 <td class="fw-semibold text-dark">@product.Name</td>
-                                <td><span class="badge bg-success px-3 py-2">@product.TotalStock Adet</span></td>
+                                <td><span class="badge bg-success px-3 py-2">@product.TotalStock Units</span></td>
                                 <td class="fw-bold text-dark">@product.Price.ToString("C")</td>
                             </tr>
                         }
@@ -121,7 +121,7 @@
     {
         if (string.IsNullOrEmpty(newProduct.SKU) || string.IsNullOrEmpty(newProduct.Name))
         {
-            formMessage = "Lütfen SKU ve Ürün Adı alanlarını doldurun.";
+            formMessage = "Please fill in the SKU and Product Name fields.";
             return;
         }
 
@@ -130,18 +130,18 @@
             var response = await Http.PostAsJsonAsync("api/Products", newProduct);
             if (response.IsSuccessStatusCode)
             {
-                formMessage = "Ürün başarıyla eklendi!";
-                newProduct = new ProductFormModel(); // Formu sıfırla
-                await LoadProducts(); // Listeyi yenile
+                formMessage = "Product added successfully!";
+                newProduct = new ProductFormModel(); // Reset the form
+                await LoadProducts(); // Refresh the list
             }
             else
             {
-                formMessage = "Ürün eklenirken bir sorun oluştu.";
+                formMessage = "An issue occurred while adding the product.";
             }
         }
         catch
         {
-            formMessage = "API bağlantı hatası.";
+            formMessage = "API connection error.";
         }
     }
 

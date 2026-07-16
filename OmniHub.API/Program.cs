@@ -47,7 +47,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Sistem her başladığında veritabanı boşsa tabloları kendiliğinden inşa edecek
+// Automatically create tables on startup if the database is empty
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<OmniHubDbContext>();
@@ -70,7 +70,7 @@ app.UseHangfireDashboard("/hangfire");
 app.MapControllers();
 
 RecurringJob.AddOrUpdate<IIntegrationService>(
-    "trendyol-siparis-kontrol", 
+    "trendyol-order-check", 
     service => service.FetchNewOrdersAsync("Trendyol"), 
     Cron.Minutely());
 

@@ -9,7 +9,7 @@ public class OmniHubDbContextFactory : IDesignTimeDbContextFactory<OmniHubDbCont
     {
         var optionsBuilder = new DbContextOptionsBuilder<OmniHubDbContext>();
         
-        // Docker'daki veritabanımızın bağlantı adresi (Sadece migration işlemleri için kullanılacak)
+        // Connection string for the Docker database (used only for migrations)
         optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=OmniHubDb;Username=postgres;Password=postgres123");
 
         return new OmniHubDbContext(optionsBuilder.Options);

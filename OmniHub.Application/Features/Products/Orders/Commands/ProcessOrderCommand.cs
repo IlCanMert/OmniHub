@@ -4,7 +4,7 @@ using OmniHub.Application.Interfaces;
 
 namespace OmniHub.Application.Features.Orders.Commands;
 
-//Dışarıdan gelen sipariş verisi
+// Incoming order payload
 public class ProcessOrderCommand : IRequest<bool>
 {
     public string PlatformName { get; set; } = string.Empty;
@@ -12,7 +12,7 @@ public class ProcessOrderCommand : IRequest<bool>
     public int Quantity { get; set; }
 }
 
-//Siparişi işleyen Handler
+// Handler that processes the order
 public class ProcessOrderCommandHandler : IRequestHandler<ProcessOrderCommand, bool>
 {
     private readonly IApplicationDbContext _context;
@@ -26,19 +26,19 @@ public class ProcessOrderCommandHandler : IRequestHandler<ProcessOrderCommand, b
 
     public async Task<bool> Handle(ProcessOrderCommand request, CancellationToken cancellationToken)
     {
-        //Sipariş edilen ürünü SKU koduna göre bulur
+        // Finds the ordered product by SKU
         var product = await _context.Products
             .FirstOrDefaultAsync(p => p.SKU == request.SKU, cancellationToken);
 
         if (product == null) return false;
 
-        //Stok kontrolü
+        // Stock check
         if (product.TotalStock < request.Quantity) return false;
 
         product.TotalStock -= request.Quantity;
         await _context.SaveChangesAsync(cancellationToken);
 
-        //OTOMATİK EŞİTLEME
+        // AUTOMATIC SYNC
         string targetPlatform = request.PlatformName == "Trendyol" ? "Shopify" : "Trendyol";
         await _integrationService.UpdateStockAsync(targetPlatform, product.SKU, product.TotalStock);
 

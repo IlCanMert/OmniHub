@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization; // Gerekli kütüphane
+using Microsoft.AspNetCore.Authorization; // Required library
 using OmniHub.Application.Features.Products.Commands;
 using OmniHub.Application.Features.Products.Queries;
 
@@ -21,11 +21,11 @@ public class ProductsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
     {
-        // Gelen istek doğrudan MediatR'a gider
-        // MediatR ilgili Handler'ı bulup çalıştırır ve bize yeni ürünün ID'sini döndürür
+        // Incoming request goes directly to MediatR
+        // MediatR finds and runs the relevant handler and returns the new product ID
         var productId = await _mediator.Send(command);
         
-        return Ok(new { Message = "Ürün başarıyla eklendi!", ProductId = productId });
+        return Ok(new { Message = "Product added successfully!", ProductId = productId });
     }
 
     [HttpGet]
