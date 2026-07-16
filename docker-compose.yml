@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: omnihub_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YOUR_DATABASE_PASSWORD_HERE
+      POSTGRES_DB: OmniHubDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - omnihub_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: OmniHub.API/Dockerfile
+    container_name: omnihub_api
+    restart: on-failure
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=db;Database=OmniHubDb;Username=postgres;Password=YOUR_DATABASE_PASSWORD_HERE"
+    ports:
+      - "5154:8080"
+    networks:
+      - omnihub_net
+    depends_on:
+      db:
+        condition: service_healthy
+
+  client:
+    build:
+      context: .
+      dockerfile: OmniHub.Client/Dockerfile
+    container_name: omnihub_client
+    restart: on-failure
+    ports:
+      - "5200:80"
+    networks:
+      - omnihub_net
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+
+networks:
+  omnihub_net:

@@ -1,0 +1,161 @@
+﻿@page "/"
+@inject HttpClient Http
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@using OmniHub.Application.Features.Products.Queries;
+
+<PageTitle>OmniHub Dashboard</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-dark">OmniHub Stok Yönetimi</h1>
+    <button class="btn btn-outline-danger" @onclick="Logout">Güvenli Çıkış</button>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-3 text-dark">Yeni Ürün Ekle</h4>
+            
+            @if (!string.IsNullOrEmpty(formMessage))
+            {
+                <div class="alert alert-info">@formMessage</div>
+            }
+
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-bold">SKU (Stok Kodu)</label>
+                <input type="text" class="form-control" @bind="newProduct.SKU" placeholder="Örn: KZN-WR-001" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-bold">Ürün Adı</label>
+                <input type="text" class="form-control" @bind="newProduct.Name" placeholder="Örn: Kırmızı Kazak" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-bold">Stok Adedi</label>
+                <input type="number" class="form-control" @bind="newProduct.TotalStock" />
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-muted small fw-bold">Fiyat (₺)</label>
+                <input type="number" class="form-control" @bind="newProduct.Price" />
+            </div>
+            <button class="btn btn-dark w-100 py-2 fw-bold" @onclick="AddProduct">
+                Ürünü Kaydet
+            </button>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-3 text-dark">Stok Durumu</h4>
+            @if (products == null)
+            {
+                <p><em>Veriler yükleniyor...</em></p>
+            }
+            else if (products.Count == 0)
+            {
+                <div class="text-center py-5">
+                    <p class="text-muted mb-0">Henüz hiç ürün eklenmemiş. Soldaki formu kullanarak ilk ürününüzü ekleyin!</p>
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>SKU</th>
+                            <th>Ürün Adı</th>
+                            <th>Stok</th>
+                            <th>Fiyat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in products)
+                        {
+                            <tr>
+                                <td class="fw-bold text-secondary">@product.SKU</td>
+                                <td class="fw-semibold text-dark">@product.Name</td>
+                                <td><span class="badge bg-success px-3 py-2">@product.TotalStock Adet</span></td>
+                                <td class="fw-bold text-dark">@product.Price.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<ProductDto>? products;
+    private ProductFormModel newProduct = new();
+    private string formMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        var token = await LocalStorage.GetItemAsync<string>("authToken");
+
+        if (string.IsNullOrEmpty(token))
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        try
+        {
+            Http.DefaultRequestHeaders.Authorization = 
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            products = await Http.GetFromJsonAsync<List<ProductDto>>("api/Products");
+        }
+        catch
+        {
+            await Logout();
+        }
+    }
+
+    private async Task AddProduct()
+    {
+        if (string.IsNullOrEmpty(newProduct.SKU) || string.IsNullOrEmpty(newProduct.Name))
+        {
+            formMessage = "Lütfen SKU ve Ürün Adı alanlarını doldurun.";
+            return;
+        }
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/Products", newProduct);
+            if (response.IsSuccessStatusCode)
+            {
+                formMessage = "Ürün başarıyla eklendi!";
+                newProduct = new ProductFormModel(); // Formu sıfırla
+                await LoadProducts(); // Listeyi yenile
+            }
+            else
+            {
+                formMessage = "Ürün eklenirken bir sorun oluştu.";
+            }
+        }
+        catch
+        {
+            formMessage = "API bağlantı hatası.";
+        }
+    }
+
+    private async Task Logout()
+    {
+        await LocalStorage.RemoveItemAsync("authToken");
+        NavigationManager.NavigateTo("/login");
+    }
+
+    public class ProductFormModel
+    {
+        public string SKU { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public int TotalStock { get; set; } = 0;
+        public decimal Price { get; set; } = 0;
+    }
+}

@@ -1,0 +1,9 @@
+# .NET Core
+bin/
+obj/
+*.user
+*.userprefs
+appsettings.Development.json
+
+# Docker
+.dockerignore
